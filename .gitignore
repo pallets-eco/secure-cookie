@@ -4,7 +4,7 @@ __pycache__/
 .DS_Store
 /.idea/
 /.vscode/
-/src/secure-cookie.egg-info/
+/src/secure_cookie.egg-info/
 /build/
 /dist/
 /docs/_build/
