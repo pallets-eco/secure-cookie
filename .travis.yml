@@ -1,0 +1,25 @@
+language: python
+python:
+  - "3.7"
+  - "3.5"
+  - "2.7"
+env: TOXENV=py
+
+matrix:
+  include:
+    - env: TOXENV=stylecheck
+    - env: TOXENV=docs-html
+
+install:
+  - pip install -U tox
+
+script:
+  - tox
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.cache/pre-commit
+
+notifications:
+  email: false
