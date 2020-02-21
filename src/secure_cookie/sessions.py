@@ -66,8 +66,8 @@ from werkzeug._compat import text_type
 from werkzeug.datastructures import CallbackDict
 from werkzeug.filesystem import get_filesystem_encoding
 from werkzeug.posixemulation import rename
-from werkzeug.utils import dump_cookie
-from werkzeug.utils import parse_cookie
+from werkzeug.http import dump_cookie
+from werkzeug.http import parse_cookie
 from werkzeug.wsgi import ClosingIterator
 
 
