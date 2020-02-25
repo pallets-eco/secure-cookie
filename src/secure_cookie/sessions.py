@@ -367,8 +367,7 @@ class SessionMiddleware(object):
         self.environ_key = environ_key
 
     def __call__(self, environ, start_response):
-        cookie = parse_cookie(environ.get("HTTP_COOKIE", ""))
-        sid = cookie.get(self.cookie_name, None)
+        sid = self._get_session_id(environ)
 
         if sid is None:
             session = self.store.new()
@@ -380,26 +379,28 @@ class SessionMiddleware(object):
         def injecting_start_response(status, headers, exc_info=None):
             if session.should_save:
                 self.store.save(session)
-                headers.append(
-                    (
-                        "Set-Cookie",
-                        dump_cookie(
-                            self.cookie_name,
-                            session.sid,
-                            self.cookie_age,
-                            self.cookie_expires,
-                            self.cookie_path,
-                            self.cookie_domain,
-                            self.cookie_secure,
-                            self.cookie_httponly,
-                            samesite=self.cookie_samesite,
-                        ),
-                    )
-                )
+                headers.append(("Set-Cookie", self._dump_cookie(session)))
 
             return start_response(status, headers, exc_info)
 
         return ClosingIterator(
             self.app(environ, injecting_start_response),
             lambda: self.store.save_if_modified(session),
+        )
+
+    def _get_session_id(self, environ):
+        cookie = parse_cookie(environ.get("HTTP_COOKIE", ""))
+        return cookie.get(self.cookie_name, None)
+
+    def _dump_cookie(self, session):
+        return dump_cookie(
+            key=self.cookie_name,
+            value=session.sid,
+            max_age=self.cookie_age,
+            expires=self.cookie_expires,
+            path=self.cookie_path,
+            domain=self.cookie_domain,
+            secure=self.cookie_secure,
+            httponly=self.cookie_httponly,
+            samesite=self.cookie_samesite,
         )
