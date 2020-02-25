@@ -1,4 +1,9 @@
-from setuptools import find_packages
 from setuptools import setup
 
-setup(package_dir={"": "src"}, packages=find_packages("src"))
+# Metadata goes in setup.cfg. These are here for GitHub's dependency graph.
+setup(
+    name="secure-cookie",
+    install_requires=[
+        "Werkzeug>0.15",
+    ]
+)
