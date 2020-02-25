@@ -1,0 +1,29 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+    branches:
+      - master
+      - '*.x'
+jobs:
+  tests:
+    name: ${{ matrix.nox-session }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nox-session: ['tests', 'style', 'docs']
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('setup.py') }}-${ hashFiles('requirements/*.txt') }}
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: excitedleigh/setup-nox@0.1.0
+      - run: nox -s ${{ matrix.nox-session }}
