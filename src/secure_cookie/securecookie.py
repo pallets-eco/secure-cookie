@@ -1,97 +1,101 @@
 """
-Secure Cookie
-=============
+Secure Cookies
+==============
 
-This module implements a cookie that is not alterable from the client
-because it adds a checksum the server checks for. You can use it as a
-session replacement if all you have is a user id or something to mark a
-logged in user.
+A signed cookie that is not alterable from the client because it adds a
+checksum that the server validates. If you don't store a lot of data in
+the session, you can use a secure cookie and not need to set up storage
+on the server.
 
-Keep in mind that the data is still readable from the client as a normal
-cookie is. However you don't have to store and flush the sessions you
-have at the server.
+Keep in mind that the data is still readable from the client, only not
+writable. It is signed, not encrypted. Do not store data in a cookie you
+don't want the user to see.
 
-Example usage:
+.. code-block:: python
 
->>> from secure_cookie.securecookie import SecureCookie
->>> x = SecureCookie({"foo": 42, "baz": (1, 2, 3)}, "deadbeef")
+    rom secure_cookie.cookie import SecureCookie
+    x = SecureCookie({"foo": 42, "baz": (1, 2, 3)}, "deadbeef")
 
 Dumping into a string so that one can store it in a cookie:
 
->>> value = x.serialize()
+.. code-block:: python
+
+    value = x.serialize()
 
 Loading from that string again:
 
->>> x = SecureCookie.unserialize(value, "deadbeef")
->>> x["baz"]
-(1, 2, 3)
+.. code-block:: python
 
-If someone modifies the cookie and the checksum is wrong the unserialize
-method will fail silently and return a new empty :class:`SecureCookie`
-object.
+    x = SecureCookie.unserialize(value, "deadbeef")
+    assert x["baz"] == (1, 2, 3)
 
-Keep in mind that the values will be visible in the cookie so do not
-store data in a cookie you don't want the user to see.
+If someone modifies the cookie and the checksum is wrong the
+``unserialize`` method will fail silently and return a new empty
+:class:`SecureCookie` object.
 
 
 Application Integration
 -----------------------
 
-If you are using the Werkzeug request object you could integrate the
-secure cookie into your application like this::
+If you are using the Werkzeug ``Request`` object you could integrate a
+secure cookie into your application like this:
 
+.. code-block:: python
+
+    from secure_cookie.cookie import SecureCookie
     from werkzeug.utils import cached_property
-    from werkzeug.wrappers import BaseRequest
-    from secure_cookie.securecookie import SecureCookie
+    from werkzeug.wrappers import Response
+    from werkzeug.wrappers import Request
 
-    # Don't use this key but a different one; you could just use
-    # os.urandom(20) to get something random.
-    SECRET_KEY = '\xfa\xdd\xb8z\xae\xe0}4\x8b\xea'
+    # Don't use this key but a different one; you could use
+    # os.urandom(16) to get some random bytes.
+    SECRET_KEY = b"\xfa\xdd\xb8z\xae\xe0}4\x8b\xea"
 
-    class Request(BaseRequest):
+    class SessionRequest(Request):
         @cached_property
-        def client_session(self):
-            data = self.cookies.get("session_data")
+        def session(self):
+            data = self.cookies.get("session")
 
             if not data:
                 return SecureCookie(secret_key=SECRET_KEY)
 
             return SecureCookie.unserialize(data, SECRET_KEY)
 
-    def application(environ, start_response):
-        request = Request(environ)
-
-        # get a response object here
-        response = ...
+    @SessionRequest.application
+    def application(request):
+        response = Response(do_stuff(request))
 
         if request.client_session.should_save:
-            session_data = request.client_session.serialize()
             response.set_cookie(
-                'session_data',
-                session_data,
+                key="session",
+                value=request.client_session.serialize(),
                 httponly=True,
             )
 
-        return response(environ, start_response)
+        return response
 
-A less verbose integration can be achieved by using shorthand methods::
+A less verbose integration can be achieved by using shorthand methods:
 
-    class Request(BaseRequest):
+.. code-block:: python
+
+    class SessionRequest(Request):
         @cached_property
-        def client_session(self):
-            return SecureCookie.load_cookie(
-                self,
-                secret_key=COOKIE_SECRET,
-            )
+        def session(self):
+            return SecureCookie.load_cookie(self, secret_key=COOKIE_SECRET)
 
-    def application(environ, start_response):
-        request = Request(environ)
-
-        # get a response object here
-        response = ...
-
+    @SessionRequest.application
+    def application(request):
+        response = Response(do_stuff(request))
         request.client_session.save_cookie(response)
-        return response(environ, start_response)
+        return response
+
+
+API
+---
+
+.. autoclass:: SecureCookie
+
+.. autoexception:: UnquoteError
 """
 import base64
 import pickle
@@ -122,22 +126,24 @@ class SecureCookie(ModificationTrackingDict):
     method is a function with a similar interface to the hashlib.
     Required methods are :meth:`update` and :meth:`digest`.
 
-    Example usage:
+    .. code-block:: python
 
-    >>> x = SecureCookie({"foo": 42, "baz": (1, 2, 3)}, "deadbeef")
-    >>> x["foo"]
-    42
-    >>> x["baz"]
-    (1, 2, 3)
-    >>> x["blafasel"] = 23
-    >>> x.should_save
-    True
+        x = SecureCookie({"foo": 42, "baz": (1, 2, 3)}, "deadbeef")
+        assert x["foo"] == 42
+        assert x["baz"] == (1, 2, 3)
+        x["blafasel"] = 23
+        assert x.should_save is True
 
     :param data: The initial data. Either a dict, list of tuples, or
         ``None``.
-    :param secret_key: The secret key. If not set ``None`` or not
-        specified it has to be set before :meth:`serialize` is called.
+    :param secret_key: The secret key. If ``None`` or not specified it
+        has to be set before :meth:`serialize` is called.
     :param new: The initial value of the ``new`` flag.
+
+    .. versionchanged:: 0.1.0
+        The default serialization method is ``json`` instead of
+        ``pickle``. To upgrade existing tokens, override unquote to try
+        ``pickle`` if ``json`` fails.
     """
 
     #: The hash method to use. This has to be a module with a new
@@ -150,11 +156,11 @@ class SecureCookie(ModificationTrackingDict):
     hash_method = staticmethod(_default_hash)
 
     #: The module used for serialization. Should have a ``dumps`` and a
-    #: ``loads`` method that takes bytes. The default is :mod:`pickle`.
+    #: ``loads`` method that takes bytes. The default is :mod:`json`.
     #:
-    #: .. versionchanged:: 0.1
-    #:     The default of ``pickle`` will change to :mod:`json` in 1.0.
-    serialization_method = pickle
+    #: .. versionchanged:: 0.1.0
+    #:     Use ``json`` instead of ``pickle``.
+    serialization_method = _JSONModule
 
     #: If the contents should be base64 quoted. This can be disabled if
     #: the serialization process returns cookie safe strings only.
@@ -224,9 +230,9 @@ class SecureCookie(ModificationTrackingDict):
 
             return value
         except Exception:
-            # Unfortunately pickle and other serialization modules can
-            # cause pretty much every error here. If we get one we catch
-            # it and convert it into an UnquoteError.
+            # Unfortunately serialization modules can cause pretty much
+            # every error here. If we get one we catch it and convert it
+            # into an UnquoteError.
             raise UnquoteError()
 
     def serialize(self, expires=None):
@@ -299,7 +305,7 @@ class SecureCookie(ModificationTrackingDict):
                 items[key] = value
 
             # no parsing error and the mac looks okay, we can now
-            # sercurely unpickle our cookie.
+            # load the cookie.
             try:
                 client_hash = base64.b64decode(base64_hash)
             except TypeError:
@@ -327,8 +333,8 @@ class SecureCookie(ModificationTrackingDict):
         the cookie is not set, a new :class:`SecureCookie` instance is
         returned.
 
-        :param request: A request object that has a `cookies` attribute
-            which is a dict of all cookie values.
+        :param request: A request object that has a ``cookies``
+            attribute which is a dict of all cookie values.
         :param key: The name of the cookie.
         :param secret_key: The secret key used to unquote the cookie.
             Always provide the value even though it has no default!
@@ -355,10 +361,10 @@ class SecureCookie(ModificationTrackingDict):
     ):
         """Save the data securely in a cookie on response object. All
         parameters that are not described here are forwarded directly
-        to :meth:`~BaseResponse.set_cookie`.
+        to ``set_cookie``.
 
-        :param response: A response object that has a
-            :meth:`~BaseResponse.set_cookie` method.
+        :param response: A response object that has a ``set_cookie``
+            method.
         :param key: The name of the cookie.
         :param session_expires: The expiration date of the secure cookie
             stored information. If this is not provided the cookie

@@ -2,53 +2,81 @@
 Sessions
 ========
 
-This module contains some helper classes that help one to add session
-support to a python WSGI application. For full client-side session
-storage see :mod:`secure_cookie.securecookie` which implements a secure,
-client-side session storage.
+Add session support to a WSGI application. For full client-side session
+storage see :mod:`secure_cookie.cookie`.
 
 
-Application Integration
------------------------
+Session Store
+-------------
 
-::
+To have the most control over the session, use a session store directly
+in your application dispatch. :meth:`SessionStore.new` creates a new
+:class:`Session` with a unique id, and :meth:`SessionStore.get` gets an
+existing session by that id. Store the id as a cookie.
 
-    from secure_cookie.sessions import SessionMiddleware
-    from secure_cookie.sessions import FilesystemSessionStore
-    app = SessionMiddleware(app, FilesystemSessionStore())
+.. code-block:: python
 
-The current session will then appear in the WSGI environment as
-``werkzeug.session``. However it's recommended to not use the middleware
-but the stores directly in the application. However for very simple
-scripts a middleware for sessions could be sufficient.
-
-This module does not implement methods or ways to check if a session is
-expired. That should be done by a cron job and storage specific. For
-example to prune unused filesystem sessions one could check the modified
-time of the files. If sessions are stored in the database the ``new()``
-method should add an expiration timestamp for the session.
-
-For better flexibility it's recommended to not use the middleware but
-the store and session object directly in the application dispatching::
+    from secure_cookie.session import FilesystemSessionStore
+    from werkzeug.wrappers import Request, Response
 
     session_store = FilesystemSessionStore()
 
-    def application(environ, start_response):
-        request = Request(environ)
-        sid = request.cookies.get('cookie_name')
+    @Request.application
+    def application(request):
+        sid = request.cookies.get("session_id")
 
         if sid is None:
             request.session = session_store.new()
         else:
             request.session = session_store.get(sid)
 
-        response = get_the_response_object(request)
+        response = Response(do_stuff(request))
 
         if request.session.should_save:
             session_store.save(request.session)
-            response.set_cookie('cookie_name', request.session.sid)
+            response.set_cookie("session_id", request.session.sid)
 
-        return response(environ, start_response)
+        return response
+
+
+Cleanup
+-------
+
+This module does not implement a way to check if a session is expired.
+That should be done by a scheduled job independent of the running
+application, and is storage-specific. For example, to prune unused
+filesystem sessions one could check the modified time of the files. If
+sessions are stored in the database, the ``new()`` method could add an
+expiration timestamp.
+
+
+Middleware
+----------
+
+For simple applications, :class:`SessionMiddleware` is provided. This
+makes the current session available in the WSGI environment as the
+``secure_cookie.session`` key. This is convenient, but not as flexible
+as using the store directly.
+
+.. code-block:: python
+
+    from secure_cookie.sessions import FilesystemSessionStore
+    from secure_cookie.sessions import SessionMiddleware
+
+    session_store = FileSystemSessionStore()
+    app = SessionMiddleware(app, session_store)
+
+
+API
+---
+
+.. autoclass:: Session
+
+.. autoclass:: SessionStore
+
+.. autoclass:: FilesystemSessionStore
+
+.. autoclass:: SessionMiddleware
 """
 import os
 import re
@@ -178,7 +206,7 @@ class SessionStore(object):
 
 
 # Used for temporary files by the filesystem session store.
-_fs_transaction_suffix = ".__wz_sess"
+_fs_transaction_suffix = ".__session"
 
 
 class FilesystemSessionStore(SessionStore):
@@ -192,12 +220,16 @@ class FilesystemSessionStore(SessionStore):
     :param session_class: The session class to use.
     :param renew_missing: Set to ``True`` if you want the store to give
         the user a new sid if the session was not yet saved.
+
+    .. versionchanged:: 0.1.0
+        ``filename_template`` defaults to ``secure_cookie_%s.session``
+        instead of ``werkzeug_%s.sess``.
     """
 
     def __init__(
         self,
         path=None,
-        filename_template="werkzeug_%s.sess",
+        filename_template="secure_cookie_%s.session",
         session_class=Session,
         renew_missing=False,
         mode=0o644,
@@ -282,7 +314,7 @@ class FilesystemSessionStore(SessionStore):
         )
         result = []
         for filename in os.listdir(self.path):
-            #: this is a session that is still being saved.
+            # this is a session that is still being saved.
             if filename.endswith(_fs_transaction_suffix):
                 continue
             match = filename_re.match(filename)
@@ -304,6 +336,10 @@ class SessionMiddleware(object):
     function just prefixed with ``cookie_``. Additionally ``max_age`` is
     called ``cookie_age`` and not ``cookie_max_age`` because of
     backwards compatibility.
+
+    .. versionchanged:: 0.1.0
+        ``environ_key`` defaults to ``secure_cookie.session`` instead of
+        ``werkzeug.session``.
     """
 
     def __init__(
@@ -318,7 +354,7 @@ class SessionMiddleware(object):
         cookie_secure=None,
         cookie_httponly=False,
         cookie_samesite="Lax",
-        environ_key="werkzeug.session",
+        environ_key="secure_cookie.session",
     ):
         self.app = app
         self.store = store
