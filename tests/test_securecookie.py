@@ -1,11 +1,10 @@
 import json
 
-import pytest
-from werkzeug._compat import to_native
-from werkzeug.utils import parse_cookie
+from werkzeug.http import parse_cookie
 from werkzeug.wrappers import Request
 from werkzeug.wrappers import Response
 
+from secure_cookie._compat import to_native
 from secure_cookie.securecookie import SecureCookie
 
 
@@ -54,11 +53,6 @@ def test_wrapper_support():
     c2 = SecureCookie.load_cookie(req, secret_key=b"foo")
     assert not c2.new
     assert c2 == c
-
-
-def test_pickle_deprecated():
-    with pytest.warns(UserWarning):
-        SecureCookie({"foo": "bar"}, "secret").serialize()
 
 
 def test_json():

@@ -98,8 +98,7 @@ API
 .. autoexception:: UnquoteError
 """
 import base64
-import pickle
-import warnings
+import json as _json
 from hashlib import sha1 as _default_hash
 from hmac import new as hmac
 from time import time
@@ -112,8 +111,25 @@ from werkzeug._internal import _date_to_unix
 from werkzeug.security import safe_str_cmp
 from werkzeug.urls import url_quote_plus
 from werkzeug.urls import url_unquote_plus
+from werkzeug.utils import detect_utf_encoding
 
 from .sessions import ModificationTrackingDict
+
+class _JSONModule(object):
+    @classmethod
+    def dumps(cls, obj, **kw):
+        kw.setdefault("separators", (",", ":"))
+        kw.setdefault("sort_keys", True)
+        return _json.dumps(obj, **kw)
+
+    @staticmethod
+    def loads(s, **kw):
+        if isinstance(s, bytes):
+            # Needed for Python < 3.6
+            encoding = detect_utf_encoding(s)
+            s = s.decode(encoding)
+
+        return _json.loads(s, **kw)
 
 
 class UnquoteError(Exception):
@@ -174,14 +190,6 @@ class SecureCookie(ModificationTrackingDict):
 
         self.secret_key = secret_key
         self.new = new
-
-        if self.serialization_method is pickle:
-            warnings.warn(
-                "The default SecureCookie.serialization_method will"
-                " change from pickle to json in 1.0. To upgrade"
-                " existing tokens, override unquote to try pickle if"
-                " json fails."
-            )
 
     def __repr__(self):
         return "<%s %s%s>" % (

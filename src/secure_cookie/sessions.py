@@ -79,13 +79,11 @@ API
 .. autoclass:: SessionMiddleware
 """
 import os
+import pickle
 import re
 import tempfile
 from hashlib import sha1
 from os import path
-from pickle import dump
-from pickle import HIGHEST_PROTOCOL
-from pickle import load
 from random import random
 from time import time
 
@@ -266,7 +264,7 @@ class FilesystemSessionStore(SessionStore):
         f = os.fdopen(fd, "wb")
 
         try:
-            dump(dict(session), f, HIGHEST_PROTOCOL)
+            pickle.dump(dict(session), f, pickle.HIGHEST_PROTOCOL)
         finally:
             f.close()
 
@@ -298,7 +296,7 @@ class FilesystemSessionStore(SessionStore):
         else:
             try:
                 try:
-                    data = load(f)
+                    data = pickle.load(f)
                 except Exception:
                     data = {}
             finally:
