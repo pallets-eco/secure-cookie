@@ -204,7 +204,7 @@ class SecureCookie(ModificationTrackingDict):
     quote_base64 = True
 
     def __init__(self, data=None, secret_key=None, new=True):
-        ModificationTrackingDict.__init__(self, data or ())
+        super(SecureCookie, self).__init__(data or ())
 
         if secret_key is not None:
             secret_key = to_bytes(secret_key, "utf-8")
@@ -213,7 +213,7 @@ class SecureCookie(ModificationTrackingDict):
         self.new = new
 
     def __repr__(self):
-        return "<%s %s%s>" % (
+        return "<{} {}{}>".format(
             self.__class__.__name__,
             dict.__repr__(self),
             "*" if self.should_save else "",
@@ -286,7 +286,9 @@ class SecureCookie(ModificationTrackingDict):
         for key, value in sorted(self.items()):
             result.append(
                 (
-                    "%s=%s" % (url_quote_plus(key), self.quote(value).decode("ascii"))
+                    "{}={}".format(
+                        url_quote_plus(key), self.quote(value).decode("ascii")
+                    )
                 ).encode("ascii")
             )
             mac.update(b"|" + result[-1])

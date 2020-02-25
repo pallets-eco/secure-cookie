@@ -155,7 +155,7 @@ class Session(ModificationTrackingDict):
         self.new = new
 
     def __repr__(self):
-        return "<%s %s%s>" % (
+        return "<{} {}{}>".format(
             self.__class__.__name__,
             dict.__repr__(self),
             "*" if self.should_save else "",
@@ -275,7 +275,7 @@ class FilesystemSessionStore(SessionStore):
         try:
             rename(tmp, fn)
             os.chmod(fn, self.mode)
-        except (IOError, OSError):
+        except (IOError, OSError):  # noqa: B014
             pass
 
     def delete(self, session):
@@ -312,7 +312,7 @@ class FilesystemSessionStore(SessionStore):
         """List all sessions in the store."""
         before, after = self.filename_template.split("%s", 1)
         filename_re = re.compile(
-            r"%s(.{5,})%s$" % (re.escape(before), re.escape(after))
+            r"{}(.{{5,}}){}$".format(re.escape(before), re.escape(after))
         )
         result = []
         for filename in os.listdir(self.path):
