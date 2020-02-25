@@ -99,21 +99,41 @@ API
 """
 import base64
 import json as _json
+from datetime import datetime
 from hashlib import sha1 as _default_hash
 from hmac import new as hmac
+from numbers import Number
 from time import time
 
-from werkzeug._compat import iteritems
-from werkzeug._compat import text_type
-from werkzeug._compat import to_bytes
-from werkzeug._compat import to_native
-from werkzeug._internal import _date_to_unix
 from werkzeug.security import safe_str_cmp
 from werkzeug.urls import url_quote_plus
 from werkzeug.urls import url_unquote_plus
 from werkzeug.utils import detect_utf_encoding
 
+from ._compat import text_type
+from ._compat import to_bytes
+from ._compat import to_native
 from .sessions import ModificationTrackingDict
+
+_epoch_ord = datetime(1970, 1, 1).toordinal()
+
+
+def _date_to_unix(arg):
+    """Converts a timetuple, integer, or datetime object into the
+    seconds from epoch in UTC.
+    """
+    if isinstance(arg, datetime):
+        arg = arg.utctimetuple()
+    elif isinstance(arg, Number):
+        return int(arg)
+
+    year, month, day, hour, minute, second = arg[:6]
+    days = datetime(year, month, 1).toordinal() - _epoch_ord + day - 1
+    hours = days * 24 + hour
+    minutes = hours * 60 + minute
+    seconds = minutes * 60 + second
+    return seconds
+
 
 class _JSONModule(object):
     @classmethod
@@ -321,7 +341,7 @@ class SecureCookie(ModificationTrackingDict):
 
             if items is not None and safe_str_cmp(client_hash, mac.digest()):
                 try:
-                    for key, value in iteritems(items):
+                    for key, value in items.items():
                         items[key] = cls.unquote(value)
                 except UnquoteError:
                     items = ()

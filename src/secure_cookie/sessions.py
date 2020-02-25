@@ -87,15 +87,15 @@ from os import path
 from random import random
 from time import time
 
-from werkzeug._compat import PY2
-from werkzeug._compat import text_type
 from werkzeug.datastructures import CallbackDict
 from werkzeug.filesystem import get_filesystem_encoding
-from werkzeug.posixemulation import rename
 from werkzeug.http import dump_cookie
 from werkzeug.http import parse_cookie
+from werkzeug.posixemulation import rename
 from werkzeug.wsgi import ClosingIterator
 
+from ._compat import PY2
+from ._compat import text_type
 
 _sha1_re = re.compile(r"^[a-f0-9]{40}$")
 
