@@ -71,12 +71,16 @@ API
 ---
 
 .. autoclass:: Session
+    :members:
 
 .. autoclass:: SessionStore
+    :members:
 
 .. autoclass:: FilesystemSessionStore
+    :members:
 
 .. autoclass:: SessionMiddleware
+    :members:
 """
 import os
 import pickle

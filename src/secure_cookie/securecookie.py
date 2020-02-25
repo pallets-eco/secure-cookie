@@ -94,6 +94,7 @@ API
 ---
 
 .. autoclass:: SecureCookie
+    :members:
 
 .. autoexception:: UnquoteError
 """
