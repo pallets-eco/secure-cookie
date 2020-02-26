@@ -1,7 +1,7 @@
 import os
 from tempfile import gettempdir
 
-from secure_cookie.sessions import FilesystemSessionStore
+from secure_cookie.session import FilesystemSessionStore
 
 
 def test_default_tempdir():

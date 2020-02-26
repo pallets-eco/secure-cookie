@@ -114,7 +114,7 @@ from werkzeug.utils import detect_utf_encoding
 from ._compat import text_type
 from ._compat import to_bytes
 from ._compat import to_native
-from .sessions import ModificationTrackingDict
+from .session import ModificationTrackingDict
 
 _epoch_ord = datetime(1970, 1, 1).toordinal()
 

@@ -1,1 +1,1 @@
-.. automodule:: secure_cookie.sessions
+.. automodule:: secure_cookie.session

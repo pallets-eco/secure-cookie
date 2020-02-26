@@ -1,1 +1,1 @@
-.. automodule:: secure_cookie.securecookie
+.. automodule:: secure_cookie.cookie

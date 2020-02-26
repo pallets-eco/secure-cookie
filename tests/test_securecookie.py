@@ -5,7 +5,7 @@ from werkzeug.wrappers import Request
 from werkzeug.wrappers import Response
 
 from secure_cookie._compat import to_native
-from secure_cookie.securecookie import SecureCookie
+from secure_cookie.cookie import SecureCookie
 
 
 def test_basic_support():
