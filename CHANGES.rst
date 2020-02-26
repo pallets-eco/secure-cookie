@@ -1,7 +1,7 @@
 Version 0.1.0
 -------------
 
-Unreleased
+Released 2020-02-26
 
 -   Extracted from Werkzeug 0.15.
 -   Dropped support for Python 3.4.
