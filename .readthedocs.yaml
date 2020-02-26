@@ -4,3 +4,5 @@ python:
     - method: pip
       path: .
     - requirements: requirements/docs.txt
+sphinx:
+  builder: dirhtml
