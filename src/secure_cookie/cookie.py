@@ -13,7 +13,7 @@ don't want the user to see.
 
 .. code-block:: python
 
-    rom secure_cookie.cookie import SecureCookie
+    from secure_cookie.cookie import SecureCookie
     x = SecureCookie({"foo": 42, "baz": (1, 2, 3)}, "deadbeef")
 
 Dumping into a string so that one can store it in a cookie:
