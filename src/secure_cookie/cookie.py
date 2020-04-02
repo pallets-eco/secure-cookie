@@ -268,7 +268,7 @@ class SecureCookie(ModificationTrackingDict):
         """Serialize the secure cookie into a string.
 
         If expires is provided, the session will be automatically
-        invalidated after expiration when you unseralize it. This
+        invalidated after expiration when you unserialize it. This
         provides better protection against session cookie theft.
 
         :param expires: An optional expiration date for the cookie (a
