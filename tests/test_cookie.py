@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from werkzeug.http import parse_cookie
@@ -33,6 +34,21 @@ def test_basic_support():
     c4 = SecureCookie({"x": 42}, "foo")
     c4_serialized = c4.serialize()
     assert SecureCookie.unserialize(c4_serialized, "foo") == c4
+
+
+def test_expire_support():
+    c = SecureCookie(secret_key=b"foo")
+    c["x"] = 42
+    in_the_future = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    s_future = c.serialize(expires=in_the_future)
+    in_the_past = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+    s_past = c.serialize(expires=in_the_past)
+
+    c2 = SecureCookie.unserialize(s_future, b"foo")
+    assert c2["x"] == 42
+
+    c3 = SecureCookie.unserialize(s_past, b"foo")
+    assert "x" not in c3
 
 
 def test_wrapper_support():
