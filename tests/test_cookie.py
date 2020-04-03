@@ -1,6 +1,7 @@
 import datetime
 import json
 
+import pytest
 from werkzeug.http import parse_cookie
 from werkzeug.wrappers import Request
 from werkzeug.wrappers import Response
@@ -26,7 +27,8 @@ def test_basic_support():
     assert not c2.should_save
     assert c2 == c
 
-    c3 = SecureCookie.unserialize(s, b"wrong foo")
+    with pytest.warns(DeprecationWarning):
+        c3 = SecureCookie.unserialize(s, b"wrong foo")
     assert not c3.modified
     assert not c3.new
     assert c3 == {}
@@ -56,7 +58,8 @@ def test_hmac_serialization_support():
     c["x"] = 42
     s = c._mac_serialize()
 
-    c2 = SecureCookie.unserialize(s, b"foo")
+    with pytest.warns(DeprecationWarning):
+        c2 = SecureCookie.unserialize(s, b"foo")
     assert c is not c2
     assert not c2.new
     assert not c2.modified

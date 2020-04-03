@@ -100,6 +100,7 @@ API
 """
 import base64
 import json as _json
+import warnings
 from datetime import datetime
 from hashlib import sha1 as _default_hash
 from hmac import new as hmac
@@ -365,6 +366,7 @@ class SecureCookie(ModificationTrackingDict):
 
     @classmethod
     def _mac_unserialize(cls, string, secret_key):
+        warnings.warn("Obsolete serialization method used", DeprecationWarning)
         try:
             base64_hash, data = string.split(b"?", 1)
         except (ValueError, IndexError):
