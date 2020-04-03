@@ -292,7 +292,7 @@ class SecureCookie(ModificationTrackingDict):
                     )
                 ).encode("ascii")
             )
-        signer = Signer(self.secret_key)
+        signer = Signer(self.secret_key, digest_method=self.hash_method)
         return signer.sign(b"&".join(result))
 
     def _mac_serialize(self):
@@ -325,7 +325,7 @@ class SecureCookie(ModificationTrackingDict):
         if isinstance(secret_key, text_type):
             secret_key = secret_key.encode("utf-8", "replace")
 
-        signer = Signer(secret_key)
+        signer = Signer(secret_key, digest_method=cls.hash_method)
         try:
             serialized = signer.unsign(string)
         except BadSignature:
