@@ -280,6 +280,9 @@ class SecureCookie(ModificationTrackingDict):
         if expires:
             self["_expires"] = _date_to_unix(expires)
 
+        return self._mac_serialize()
+
+    def _mac_serialize(self):
         result = []
         mac = hmac(self.secret_key, None, self.hash_method)
 
