@@ -106,6 +106,8 @@ from hmac import new as hmac
 from numbers import Number
 from time import time
 
+from itsdangerous import Signer
+from itsdangerous.exc import BadSignature
 from werkzeug.security import safe_str_cmp
 from werkzeug.urls import url_quote_plus
 from werkzeug.urls import url_unquote_plus
@@ -280,7 +282,17 @@ class SecureCookie(ModificationTrackingDict):
         if expires:
             self["_expires"] = _date_to_unix(expires)
 
-        return self._mac_serialize()
+        result = []
+        for key, value in sorted(self.items()):
+            result.append(
+                (
+                    "{}={}".format(
+                        url_quote_plus(key), self.quote(value).decode("ascii")
+                    )
+                ).encode("ascii")
+            )
+        signer = Signer(self.secret_key)
+        return signer.sign(b"&".join(result))
 
     def _mac_serialize(self):
         result = []
@@ -312,7 +324,44 @@ class SecureCookie(ModificationTrackingDict):
         if isinstance(secret_key, text_type):
             secret_key = secret_key.encode("utf-8", "replace")
 
-        return cls._mac_unserialize(string, secret_key)
+        signer = Signer(secret_key)
+        try:
+            serialized = signer.unsign(string)
+        except BadSignature:
+            return cls._mac_unserialize(string, secret_key)
+
+        items = {}
+        for item in serialized.split(b"&"):
+            if b"=" not in item:
+                items = None
+                break
+
+            key, value = item.split(b"=", 1)
+            # try to make the key a string
+            key = url_unquote_plus(key.decode("ascii"))
+
+            try:
+                key = to_native(key)
+            except UnicodeError:
+                pass
+
+            items[key] = value
+
+        if items is not None:
+            try:
+                for key, value in items.items():
+                    items[key] = cls.unquote(value)
+            except UnquoteError:
+                items = ()
+            else:
+                if "_expires" in items:
+                    if time() > items["_expires"]:
+                        items = ()
+                    else:
+                        del items["_expires"]
+        else:
+            items = ()
+        return cls(items, secret_key, False)
 
     @classmethod
     def _mac_unserialize(cls, string, secret_key):
