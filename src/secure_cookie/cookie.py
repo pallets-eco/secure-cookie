@@ -309,6 +309,10 @@ class SecureCookie(ModificationTrackingDict):
         if isinstance(secret_key, text_type):
             secret_key = secret_key.encode("utf-8", "replace")
 
+        return cls._mac_unserialize(string, secret_key)
+
+    @classmethod
+    def _mac_unserialize(cls, string, secret_key):
         try:
             base64_hash, data = string.split(b"?", 1)
         except (ValueError, IndexError):
