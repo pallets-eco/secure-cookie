@@ -366,7 +366,11 @@ class SecureCookie(ModificationTrackingDict):
 
     @classmethod
     def _mac_unserialize(cls, string, secret_key):
-        warnings.warn("Obsolete serialization method used", DeprecationWarning)
+        warnings.warn(
+            "Unserializing using the old scheme. This is deprecated and the fallback will be removed in version 2.0. Ensure cookies are re-serialized using the new ItsDangerous scheme.",  # noqa
+            DeprecationWarning,
+            stacklevel=3,
+        )
         try:
             base64_hash, data = string.split(b"?", 1)
         except (ValueError, IndexError):
