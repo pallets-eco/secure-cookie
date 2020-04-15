@@ -95,11 +95,11 @@ from werkzeug.datastructures import CallbackDict
 from werkzeug.filesystem import get_filesystem_encoding
 from werkzeug.http import dump_cookie
 from werkzeug.http import parse_cookie
-from werkzeug.posixemulation import rename
 from werkzeug.wsgi import ClosingIterator
 
 from ._compat import PY2
 from ._compat import text_type
+from .posixemulation import rename
 
 _sha1_re = re.compile(r"^[a-f0-9]{40}$")
 
