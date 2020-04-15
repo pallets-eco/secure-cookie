@@ -11,7 +11,24 @@ import time
 
 from werkzeug.filesystem import get_filesystem_encoding
 
-from ._internal import _to_str
+
+def _to_str(
+    x,
+    charset=sys.getdefaultencoding(),  # noqa: B008
+    errors="strict",
+    allow_none_charset=False,
+):
+    if x is None or isinstance(x, str):
+        return x
+
+    if not isinstance(x, bytes):
+        return str(x)
+
+    if charset is None and allow_none_charset:
+        return x
+
+    return x.decode(charset, errors)
+
 
 can_rename_open_file = False
 
