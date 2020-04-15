@@ -1,3 +1,10 @@
+Version 0.1.1
+-------------
+
+Unreleased
+
+-   Extracted ``posixemulation`` from Werkzeug 1.0.1
+
 Version 0.1.0
 -------------
 
