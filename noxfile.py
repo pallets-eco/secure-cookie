@@ -1,7 +1,7 @@
 import nox
 
 
-@nox.session(python=["3.8", "3.7", "3.6", "3.5", "2.7"])
+@nox.session(python=["3.8", "3.7", "3.6", "3.5", "2.7", "pypy3"])
 def tests(session):
     if session.python == "2.7":
         # unpinned on 2.7 so pip will find the last supported versions.
