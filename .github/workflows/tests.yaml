@@ -19,8 +19,6 @@ jobs:
           - {name: Linux, python: '3.8', os: ubuntu-latest, nox: tests-3.8}
           - {name: '3.7', python: '3.7', os: ubuntu-latest, nox: tests-3.7}
           - {name: '3.6', python: '3.6', os: ubuntu-latest, nox: tests-3.6}
-          - {name: '3.5', python: '3.5', os: ubuntu-latest, nox: tests-3.5}
-          - {name: '2.7', python: '2.7', os: ubuntu-latest, nox: tests-2.7}
           - {name: 'PyPy', python: pypy3, os: ubuntu-latest, nox: tests-pypy3}
           - {name: Style, python: '3.8', os: ubuntu-latest, nox: style}
           - {name: Docs, python: '3.8', os: ubuntu-latest, nox: docs}
