@@ -10,20 +10,43 @@ on:
       - '*.x'
 jobs:
   tests:
-    name: ${{ matrix.nox-session }}
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        nox-session: ['tests', 'style', 'docs']
+        include:
+          - {name: Linux, python: '3.8', os: ubuntu-latest, nox: tests-3.8}
+          - {name: '3.7', python: '3.7', os: ubuntu-latest, nox: tests-3.7}
+          - {name: '3.6', python: '3.6', os: ubuntu-latest, nox: tests-3.6}
+          - {name: 'PyPy', python: pypy3, os: ubuntu-latest, nox: tests-pypy3}
+          - {name: Style, python: '3.8', os: ubuntu-latest, nox: style}
+          - {name: Docs, python: '3.8', os: ubuntu-latest, nox: docs}
+          - {name: Windows, python: '3.8', os: windows-latest, nox: tests-3.8}
+          - {name: Mac, python: '3.8', os: macos-latest, nox: tests-3.8}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v1
+      - uses: actions/setup-python@v2
         with:
-          path: ~/.cache/pip
-          key: pip-${{ hashFiles('setup.py') }}-${ hashFiles('requirements/*.txt') }}
-      - uses: actions/cache@v1
+          python-version: ${{ matrix.python }}
+      - name: update pip
+        run: |
+          pip install -U wheel
+          pip install -U setuptools
+          pip install -U pip
+      - name: get pip cache dir
+        id: pip-cache
+        run: echo "::set-output name=dir::$(pip cache dir)"
+      - name: cache pip
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: pip|${{ runner.os }}|${{ matrix.python }}|${{ hashFiles('setup.py') }}|${{ hashFiles('requirements/*.txt') }}
+      - name: cache pre-commit
+        uses: actions/cache@v1
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-      - uses: excitedleigh/setup-nox@0.1.0
-      - run: nox -s ${{ matrix.nox-session }}
+          key: pre-commit|${{ matrix.python }}|${{ hashFiles('.pre-commit-config.yaml') }}
+        if: matrix.nox-session == 'style'
+      - run: pip install nox
+      - run: nox -s ${{ matrix.nox }}
