@@ -27,7 +27,7 @@ nox==2020.5.24            # via -r requirements/dev.in
 packaging==20.3           # via pallets-sphinx-themes, pytest, sphinx
 pallets-sphinx-themes==1.2.3  # via -r requirements/docs.in
 pluggy==0.13.1            # via pytest
-pre-commit==2.4.0         # via -r requirements/dev.in
+pre-commit==2.5.0         # via -r requirements/dev.in
 py==1.8.1                 # via nox, pytest
 pygments==2.6.1           # via sphinx
 pyparsing==2.4.7          # via packaging
