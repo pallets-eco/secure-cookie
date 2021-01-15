@@ -389,6 +389,7 @@ class SecureCookie(ModificationTrackingDict):
         secure=None,
         httponly=False,
         force=False,
+        samesite=None,
     ):
         """Save the data securely in a cookie on response object. All
         parameters that are not described here are forwarded directly
@@ -412,4 +413,5 @@ class SecureCookie(ModificationTrackingDict):
                 domain=domain,
                 secure=secure,
                 httponly=httponly,
+                samesite=samesite,
             )
