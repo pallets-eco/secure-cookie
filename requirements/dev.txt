@@ -67,7 +67,7 @@ pytest==6.2.2
     # via -r tests.in
 pytz==2020.1
     # via babel
-pyyaml==5.3.1
+pyyaml==5.4
     # via pre-commit
 requests==2.23.0
     # via sphinx
