@@ -60,10 +60,10 @@ as using the store directly.
 
 .. code-block:: python
 
-    from secure_cookie.sessions import FilesystemSessionStore
-    from secure_cookie.sessions import SessionMiddleware
+    from secure_cookie.session import FilesystemSessionStore
+    from secure_cookie.session import SessionMiddleware
 
-    session_store = FileSystemSessionStore()
+    session_store = FilesystemSessionStore()
     app = SessionMiddleware(app, session_store)
 
 
