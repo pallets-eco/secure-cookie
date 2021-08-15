@@ -99,7 +99,6 @@ from werkzeug.wsgi import ClosingIterator
 
 from ._compat import PY2
 from ._compat import text_type
-from .posixemulation import rename
 
 _sha1_re = re.compile(r"^[a-f0-9]{40}$")
 
@@ -273,7 +272,7 @@ class FilesystemSessionStore(SessionStore):
             f.close()
 
         try:
-            rename(tmp, fn)
+            os.rename(tmp, fn)
             os.chmod(fn, self.mode)
         except (IOError, OSError):  # noqa: B014
             pass
