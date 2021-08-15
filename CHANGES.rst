@@ -3,7 +3,7 @@ Version 0.1.1
 
 Unreleased
 
--   Extracted ``posixemulation`` from Werkzeug 1.0.1
+-   Replace ``posixemulation`` from Werkzeug 1.0.1 with os.rename
 
 Version 0.1.0
 -------------
