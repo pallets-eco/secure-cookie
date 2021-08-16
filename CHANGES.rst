@@ -3,6 +3,7 @@ Version 0.1.1
 
 Unreleased
 
+-   Drop python 2.x and python 3.5 support. :pr:`62`
 -   Replace ``posixemulation`` from Werkzeug 1.0.1 with ``os.rename``. :issue:`12`
 
 
