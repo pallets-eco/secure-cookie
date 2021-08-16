@@ -3,7 +3,8 @@ Version 0.1.1
 
 Unreleased
 
--   Replace ``posixemulation`` from Werkzeug 1.0.1 with os.rename
+-   Replace ``posixemulation`` from Werkzeug 1.0.1 with ``os.rename``. :issue:`12`
+
 
 Version 0.1.0
 -------------
