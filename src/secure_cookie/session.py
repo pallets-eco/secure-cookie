@@ -97,15 +97,13 @@ from werkzeug.http import parse_cookie
 from werkzeug.posixemulation import rename
 from werkzeug.wsgi import ClosingIterator
 
-from ._compat import text_type
-
 _sha1_re = re.compile(r"^[a-f0-9]{40}$")
 
 
 def _urandom():
     if hasattr(os, "urandom"):
         return os.urandom(30)
-    return text_type(random()).encode("ascii")
+    return str(random()).encode("ascii")
 
 
 def generate_key(salt=None):

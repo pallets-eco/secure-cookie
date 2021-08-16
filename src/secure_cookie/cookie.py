@@ -111,7 +111,6 @@ from werkzeug.urls import url_quote_plus
 from werkzeug.urls import url_unquote_plus
 from werkzeug.utils import detect_utf_encoding
 
-from ._compat import text_type
 from ._compat import to_bytes
 from ._compat import to_native
 from .session import ModificationTrackingDict
@@ -303,10 +302,10 @@ class SecureCookie(ModificationTrackingDict):
         :param secret_key: The secret key used to serialize the cookie.
         :return: A new :class:`SecureCookie`.
         """
-        if isinstance(string, text_type):
+        if isinstance(string, str):
             string = string.encode("utf-8", "replace")
 
-        if isinstance(secret_key, text_type):
+        if isinstance(secret_key, str):
             secret_key = secret_key.encode("utf-8", "replace")
 
         try:

@@ -3,8 +3,6 @@ import sys
 
 _default_encoding = sys.getdefaultencoding()
 
-text_type = str
-
 
 def to_bytes(x, charset=_default_encoding, errors="strict"):
     if x is None:
