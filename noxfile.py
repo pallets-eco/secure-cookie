@@ -1,13 +1,9 @@
 import nox
 
 
-@nox.session(python=["3.8", "3.7", "3.6", "3.5", "2.7", "pypy3"])
+@nox.session(python=["3.9", "3.8", "3.7", "3.6", "pypy3"])
 def tests(session):
-    if session.python == "2.7":
-        # unpinned on 2.7 so pip will find the last supported versions.
-        session.install(".", "-r", "requirements/tests.in")
-    else:
-        session.install(".", "-r", "requirements/tests.txt")
+    session.install(".", "-r", "requirements/tests.txt")
     session.run("pytest", *session.posargs)
 
 
