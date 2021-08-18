@@ -235,6 +235,8 @@ class FilesystemSessionStore(SessionStore):
 
         if path is None:
             path = tempfile.gettempdir()
+        else:
+            os.makedirs(path, exist_ok=True)
 
         self.path = path
 

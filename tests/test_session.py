@@ -64,3 +64,12 @@ def test_fs_session_lising(tmpdir):
 
     listed_sessions = set(store.list())
     assert sessions == listed_sessions
+
+
+def test_create_directories_if_needed(tmpdir):
+    path = f"{tmpdir}/more/dirs/"
+    store = FilesystemSessionStore(path)
+    x = store.new()
+    x["foo"] = [1, 2, 3]
+    assert x.modified
+    store.save(x)
