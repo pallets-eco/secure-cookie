@@ -233,10 +233,10 @@ class FilesystemSessionStore(SessionStore):
     ):
         super(FilesystemSessionStore, self).__init__(session_class=session_class)
 
-        if path is None:
-            path = tempfile.gettempdir()
-        else:
+        if path:
             os.makedirs(path, exist_ok=True)
+        else:
+            path = tempfile.gettempdir()
 
         self.path = path
 
