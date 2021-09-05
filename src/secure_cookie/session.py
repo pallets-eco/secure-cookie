@@ -83,6 +83,7 @@ API
     :members:
 """
 import os
+import pathlib
 import pickle
 import re
 import tempfile
@@ -234,7 +235,10 @@ class FilesystemSessionStore(SessionStore):
         super(FilesystemSessionStore, self).__init__(session_class=session_class)
 
         if path:
-            os.makedirs(path, exist_ok=True)
+            try:
+                pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+            except OSError:
+                raise
         else:
             path = tempfile.gettempdir()
 
