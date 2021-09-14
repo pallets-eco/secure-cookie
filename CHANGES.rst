@@ -1,3 +1,12 @@
+Version 0.x.y
+-------------
+
+Released 202
+
+-   ``FilesystemSessionStore`` tries to create ``path`` if the specified
+    location does not exist. :pr:`66`
+
+
 Version 0.2.0
 -------------
 
