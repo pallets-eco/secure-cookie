@@ -257,11 +257,11 @@ class SecureCookie(ModificationTrackingDict):
                 value = cls.serialization_method.loads(value)
 
             return value
-        except Exception:
+        except Exception as exc:
             # Unfortunately serialization modules can cause pretty much
             # every error here. If we get one we catch it and convert it
             # into an UnquoteError.
-            raise UnquoteError()
+            raise UnquoteError() from exc
 
     def serialize(self, expires=None):
         """Serialize the secure cookie into a string.
