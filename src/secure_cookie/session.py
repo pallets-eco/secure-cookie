@@ -83,11 +83,11 @@ API
     :members:
 """
 import os
+import pathlib
 import pickle
 import re
 import tempfile
 from hashlib import sha1
-from os import path
 from random import random
 from time import time
 
@@ -233,7 +233,12 @@ class FilesystemSessionStore(SessionStore):
     ):
         super(FilesystemSessionStore, self).__init__(session_class=session_class)
 
-        if path is None:
+        if path:
+            try:
+                pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+            except OSError:
+                raise
+        else:
             path = tempfile.gettempdir()
 
         self.path = path
@@ -249,7 +254,7 @@ class FilesystemSessionStore(SessionStore):
         # Out of the box this should be a strict ASCII subset, but you
         # might reconfigure the session object to have a more arbitrary
         # string.
-        return path.join(self.path, self.filename_template % sid)
+        return str(pathlib.Path(self.path, self.filename_template % sid))
 
     def save(self, session):
         fn = self.get_session_filename(session.sid)
