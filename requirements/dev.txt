@@ -43,7 +43,7 @@ markupsafe==2.0.1
 nodeenv==1.6.0
     # via pre-commit
 nox==2021.10.1
-    # via -r requirements/dev.in
+    # via -r dev.in
 packaging==21.2
     # via
     #   nox
@@ -51,13 +51,13 @@ packaging==21.2
     #   pytest
     #   sphinx
 pallets-sphinx-themes==2.0.1
-    # via -r requirements/docs.in
+    # via -r docs.in
 platformdirs==2.4.0
     # via virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==2.15.0
-    # via -r requirements/dev.in
+pre-commit==2.16.0
+    # via -r dev.in
 py==1.10.0
     # via
     #   nox
@@ -67,7 +67,7 @@ pygments==2.10.0
 pyparsing==2.4.7
     # via packaging
 pytest==6.2.5
-    # via -r requirements/tests.in
+    # via -r tests.in
 pytz==2021.3
     # via babel
 pyyaml==6.0
@@ -80,12 +80,12 @@ snowballstemmer==2.1.0
     # via sphinx
 sphinx==4.2.0
     # via
-    #   -r requirements/docs.in
+    #   -r docs.in
     #   pallets-sphinx-themes
     #   sphinx-issues
     #   sphinxcontrib-log-cabinet
 sphinx-issues==1.2.0
-    # via -r requirements/docs.in
+    # via -r docs.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -95,7 +95,7 @@ sphinxcontrib-htmlhelp==2.0.0
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-log-cabinet==1.0.1
-    # via -r requirements/docs.in
+    # via -r docs.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
