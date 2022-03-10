@@ -12,7 +12,7 @@ attrs==21.2.0
     # via pytest
 babel==2.9.1
     # via sphinx
-backports.entry-points-selectable==1.1.0
+backports-entry-points-selectable==1.1.0
     # via virtualenv
 certifi==2021.10.8
     # via requests
@@ -66,7 +66,7 @@ pygments==2.10.0
     # via sphinx
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.5
+pytest==7.0.1
     # via -r tests.in
 pytz==2021.3
     # via babel
@@ -101,9 +101,9 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 toml==0.10.2
-    # via
-    #   pre-commit
-    #   pytest
+    # via pre-commit
+tomli==2.0.1
+    # via pytest
 urllib3==1.26.7
     # via requests
 virtualenv==20.10.0
