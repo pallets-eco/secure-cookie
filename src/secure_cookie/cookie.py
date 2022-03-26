@@ -100,12 +100,15 @@ API
 """
 import base64
 import json as _json
+import warnings
 from datetime import datetime
 from hashlib import sha1 as _default_hash
 from hmac import new as hmac
 from numbers import Number
 from time import time
 
+from itsdangerous import Signer
+from itsdangerous.exc import BadSignature
 from werkzeug.security import safe_str_cmp
 from werkzeug.urls import url_quote_plus
 from werkzeug.urls import url_unquote_plus
@@ -280,6 +283,19 @@ class SecureCookie(ModificationTrackingDict):
             self["_expires"] = _date_to_unix(expires)
 
         result = []
+        for key, value in sorted(self.items()):
+            result.append(
+                (
+                    "{}={}".format(
+                        url_quote_plus(key), self.quote(value).decode("ascii")
+                    )
+                ).encode("ascii")
+            )
+        signer = Signer(self.secret_key, digest_method=self.hash_method)
+        return signer.sign(b"&".join(result))
+
+    def _mac_serialize(self):
+        result = []
         mac = hmac(self.secret_key, None, self.hash_method)
 
         for key, value in sorted(self.items()):
@@ -308,6 +324,52 @@ class SecureCookie(ModificationTrackingDict):
         if isinstance(secret_key, str):
             secret_key = secret_key.encode("utf-8", "replace")
 
+        signer = Signer(secret_key, digest_method=cls.hash_method)
+        try:
+            serialized = signer.unsign(string)
+        except BadSignature:
+            return cls._mac_unserialize(string, secret_key)
+
+        items = {}
+        for item in serialized.split(b"&"):
+            if b"=" not in item:
+                items = None
+                break
+
+            key, value = item.split(b"=", 1)
+            # try to make the key a string
+            key = url_unquote_plus(key.decode("ascii"))
+
+            try:
+                key = to_native(key)
+            except UnicodeError:
+                pass
+
+            items[key] = value
+
+        if items is not None:
+            try:
+                for key, value in items.items():
+                    items[key] = cls.unquote(value)
+            except UnquoteError:
+                items = ()
+            else:
+                if "_expires" in items:
+                    if time() > items["_expires"]:
+                        items = ()
+                    else:
+                        del items["_expires"]
+        else:
+            items = ()
+        return cls(items, secret_key, False)
+
+    @classmethod
+    def _mac_unserialize(cls, string, secret_key):
+        warnings.warn(
+            "Unserializing using the old scheme. This is deprecated and the fallback will be removed in version 2.0. Ensure cookies are re-serialized using the new ItsDangerous scheme.",  # noqa
+            DeprecationWarning,
+            stacklevel=3,
+        )
         try:
             base64_hash, data = string.split(b"?", 1)
         except (ValueError, IndexError):
