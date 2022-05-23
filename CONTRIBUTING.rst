@@ -17,7 +17,7 @@ with your own code:
     issues.
 -   Ask on Stack Overflow.
 
-eporting issues
+Reporting issues
 ----------------
 
 Include the following information in your post:
