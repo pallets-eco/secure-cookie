@@ -5,6 +5,7 @@ Unreleased
 
 -   ``FilesystemSessionStore`` tries to create ``path`` if the specified
     location does not exist. :pr:`66`
+-   Support for Werkzeug version 2.1.0+ (PR nr to be determined)
 
 
 Version 0.2.0
