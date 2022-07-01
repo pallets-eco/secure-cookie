@@ -78,7 +78,7 @@ six==1.16.0
     # via virtualenv
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==5.0.1
+sphinx==5.0.2
     # via
     #   -r docs.in
     #   pallets-sphinx-themes
