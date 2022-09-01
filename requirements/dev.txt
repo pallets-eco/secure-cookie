@@ -42,7 +42,7 @@ markupsafe==2.0.1
     # via jinja2
 nodeenv==1.6.0
     # via pre-commit
-nox==2022.1.7
+nox==2022.8.7
     # via -r dev.in
 packaging==21.2
     # via
