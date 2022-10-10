@@ -134,7 +134,7 @@ def _date_to_unix(arg):
     return seconds
 
 
-class _JSONModule(object):
+class _JSONModule:
     @classmethod
     def dumps(cls, obj, **kw):
         kw.setdefault("separators", (",", ":"))
@@ -197,7 +197,7 @@ class SecureCookie(ModificationTrackingDict):
     quote_base64 = True
 
     def __init__(self, data=None, secret_key=None, new=True):
-        super(SecureCookie, self).__init__(data or ())
+        super().__init__(data or ())
 
         if secret_key is not None:
             secret_key = to_bytes(secret_key, "utf-8")
