@@ -119,7 +119,7 @@ class ModificationTrackingDict(CallbackDict):
             self.modified = True
 
         self.modified = False
-        super(ModificationTrackingDict, self).__init__(on_update=on_update)
+        super().__init__(on_update=on_update)
         dict.update(self, *args, **kwargs)
 
     def copy(self):
@@ -145,7 +145,7 @@ class Session(ModificationTrackingDict):
     __slots__ = ModificationTrackingDict.__slots__ + ("sid", "new")
 
     def __init__(self, data, sid, new=False):
-        super(Session, self).__init__(data)
+        super().__init__(data)
         self.sid = sid
         self.new = new
 
@@ -162,7 +162,7 @@ class Session(ModificationTrackingDict):
         return self.modified
 
 
-class SessionStore(object):
+class SessionStore:
     """Base class for all session stores.
 
     :param session_class: The session class to use.
@@ -231,7 +231,7 @@ class FilesystemSessionStore(SessionStore):
         renew_missing=False,
         mode=0o644,
     ):
-        super(FilesystemSessionStore, self).__init__(session_class=session_class)
+        super().__init__(session_class=session_class)
 
         if path:
             try:
@@ -269,7 +269,7 @@ class FilesystemSessionStore(SessionStore):
         try:
             os.rename(tmp, fn)
             os.chmod(fn, self.mode)
-        except (IOError, OSError):  # noqa: B014
+        except OSError:  # noqa: B014
             pass
 
     def delete(self, session):
@@ -286,7 +286,7 @@ class FilesystemSessionStore(SessionStore):
 
         try:
             f = open(self.get_session_filename(sid), "rb")
-        except IOError:
+        except OSError:
             if self.renew_missing:
                 return self.new()
 
@@ -319,7 +319,7 @@ class FilesystemSessionStore(SessionStore):
         return result
 
 
-class SessionMiddleware(object):
+class SessionMiddleware:
     """A middleware that puts the session object of a store into the
     WSGI environ. It automatically sets cookies and restores sessions.
 

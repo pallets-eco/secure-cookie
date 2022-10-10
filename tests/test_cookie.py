@@ -72,7 +72,7 @@ def test_wrapper_support():
 
 
 def test_json():
-    class JSONCompat(object):
+    class JSONCompat:
         dumps = staticmethod(json.dumps)
 
         @staticmethod
