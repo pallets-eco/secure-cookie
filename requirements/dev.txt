@@ -26,6 +26,8 @@ distlib==0.3.3
     # via virtualenv
 docutils==0.17.1
     # via sphinx
+exceptiongroup==1.0.0
+    # via pytest
 filelock==3.3.2
     # via virtualenv
 identify==2.3.3
@@ -59,14 +61,12 @@ pluggy==1.0.0
 pre-commit==2.19.0
     # via -r dev.in
 py==1.10.0
-    # via
-    #   nox
-    #   pytest
+    # via nox
 pygments==2.10.0
     # via sphinx
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.5
+pytest==7.2.0
     # via -r tests.in
 pytz==2021.3
     # via babel
@@ -101,9 +101,9 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 toml==0.10.2
-    # via
-    #   pre-commit
-    #   pytest
+    # via pre-commit
+tomli==2.0.1
+    # via pytest
 urllib3==1.26.7
     # via requests
 virtualenv==20.10.0
