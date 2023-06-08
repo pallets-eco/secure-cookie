@@ -72,7 +72,7 @@ pytz==2021.3
     # via babel
 pyyaml==6.0
     # via pre-commit
-requests==2.26.0
+requests==2.31.0
     # via sphinx
 six==1.16.0
     # via virtualenv
