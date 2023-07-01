@@ -42,7 +42,7 @@ markupsafe==2.0.1
     # via jinja2
 nodeenv==1.6.0
     # via pre-commit
-nox==2022.1.7
+nox==2023.4.22
     # via -r dev.in
 packaging==21.2
     # via
@@ -59,9 +59,7 @@ pluggy==1.0.0
 pre-commit==2.19.0
     # via -r dev.in
 py==1.10.0
-    # via
-    #   nox
-    #   pytest
+    # via pytest
 pygments==2.10.0
     # via sphinx
 pyparsing==2.4.7
