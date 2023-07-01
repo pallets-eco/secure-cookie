@@ -50,7 +50,7 @@ packaging==21.2
     #   pallets-sphinx-themes
     #   pytest
     #   sphinx
-pallets-sphinx-themes==2.0.1
+pallets-sphinx-themes==2.1.1
     # via -r docs.in
 platformdirs==2.4.0
     # via virtualenv
