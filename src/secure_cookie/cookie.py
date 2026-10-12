@@ -98,6 +98,7 @@ API
 
 .. autoexception:: UnquoteError
 """
+
 import base64
 import json as _json
 from datetime import datetime

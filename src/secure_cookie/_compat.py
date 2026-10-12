@@ -1,6 +1,5 @@
 import sys
 
-
 _default_encoding = sys.getdefaultencoding()
 
 
